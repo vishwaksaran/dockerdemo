@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  # ---------------------------------------------------------------------------
+  # PRODUCTION ENVIRONMENT
+  # Usage: docker-compose up --build production
+  # ---------------------------------------------------------------------------
+  production:
+    container_name: production_app
+    build: 
+      context: .
+      target: nginx # The final stage in Dockerfile
+    ports:
+      - "80:80"
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # LOCAL DEVELOPMENT (REACT)
+  # Usage: docker-compose up dev-react
+  # ---------------------------------------------------------------------------
+  dev-react:
+    container_name: local_react
+    build:
+      context: .
+      target: modern-builder
+    command: npm run start:react
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./react:/app/react
+      # Don't mount node_modules to ensure we use container's installed deps
+      - /app/node_modules
+
+  # ---------------------------------------------------------------------------
+  # LOCAL DEVELOPMENT (ANGULAR)
+  # Usage: docker-compose up dev-angular
+  # ---------------------------------------------------------------------------
+  dev-angular:
+    container_name: local_angular
+    build:
+      context: .
+      target: legacy-builder
+    command: npm run start:angular
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./src:/app/src
+      - ./angular:/app/angular
+      - /app/node_modules
